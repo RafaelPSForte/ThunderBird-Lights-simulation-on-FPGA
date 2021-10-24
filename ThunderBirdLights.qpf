@@ -28,3 +28,38 @@ DATE = "19:58:11  October 19, 2021"
 # Revisions
 
 PROJECT_REVISION = "ThunderBirdLights"
+
+ENTITY thunderbird IS
+PORT (
+clock : in bit;
+led : buffer bit_vector(5 downto 0);
+sw : in bit_vector(1 downto 0)
+);
+end thunderbird;
+
+architecture hardware of thunderbird is
+	SIGNAL sel : bit_vector(1 downto 0);
+BEGIN
+	light : PROCESS (clock)
+BEGIN
+	sel <= sw(1) & sw (0);
+	IF ((clock'event) and (clock = '1')) then
+		IF (sel = "01") then
+		case led is
+			WHEN "000000" => led <= "000100";
+			WHEN "000100" => led <= "000110";
+			WHEN "000110" => led <= "000111";
+			WHEN "000111" => led <= "000000";
+			WHEN OTHERS => led <= "000000";
+		END case;
+		ELSIF (sel = "11" ) then
+		case led is
+			when "000000" => led <= "111111";
+			when "111111" => led <= "000000";
+			when others => led <= "000000";
+		END case;
+		else led <= "000000";
+		END IF;
+	END IF;
+	END PROCESS light;
+END hardware;
